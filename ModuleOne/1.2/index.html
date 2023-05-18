@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding Train: Data/APIs 1.2</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+
+    <canvas id="chart" width="500" height="200"></canvas>
+
+    <script>
+        // Data from: https://data.giss.nasa.gov/gistemp/
+        // Mean from: https://earthobservatory.nasa.gov/world-of-change/DecadalTemp
+        chartIt();
+        async function chartIt() {
+            const data = await getData();
+
+            const globalDataset = {
+                label: "Global Temp.",
+                data: data.dataset[0],
+                lineTension: 0,
+                fill: false,
+                borderColor: 'blue'
+            };
+
+            const nHempDataset = {
+                label: "NHemp Temp.",
+                data: data.dataset[1],
+                lineTension: 0,
+                fill: false,
+                borderColor: 'red'
+            };
+
+            const sHempDataset = {
+                label: "SHemp Temp.",
+                data: data.dataset[2],
+                lineTension: 0,
+                fill: false,
+                borderColor: 'green'
+            };
+
+            const completeData = {
+                labels: data.xLabels,
+                datasets: [globalDataset, nHempDataset, sHempDataset]
+            };
+
+            const chartOptions = {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        boxWidth: 80,
+                        fontColor: 'black'
+                    }
+                }
+            };
+
+            const ctx = document.getElementById('chart').getContext("2d");
+
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: completeData, 
+                options: chartOptions
+            });
+        }
+
+        async function getData() {
+            const xLabels = [];
+            const globals = [];
+            const nHemps = [];
+            const sHemps = [];
+            const response = await fetch('ZonAnn.Ts+dSST.csv');
+            const data = await response.text();
+
+            const table = data.split('\n').slice(1);
+            table.forEach(row => {
+                const columns = row.split(',');
+                const year = columns[0];
+                xLabels.push(year);
+                const global = columns[1];
+                globals.push(parseFloat(global) + 14);
+                const nHemp = columns[2];
+                nHemps.push(parseFloat(nHemp) + 14);
+                const sHemp = columns[3];
+                sHemps.push(parseFloat(sHemp) + 14);
+            });
+            return { xLabels, dataset: [globals, nHemps, sHemps] };
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding Train: Data/APIs 1.3</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+        integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+
+    <style>
+        #issMap {
+            height: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Where is the ISS?</h1>
+    <button onclick=getISS()>Refresh</button>
+    <p>
+        Latitude: <span id="lat"></span><br />
+        Longitude: <span id="lon"></span>
+    </p>
+    
+    <br>
+
+    <div id="issMap">
+
+    </div>
+    <script>
+        const map = L.map('issMap').setView([0, 0],1);
+
+        const icon = L.icon({
+            iconUrl: 'iss200.png', 
+            iconSize: [30, 30], 
+            iconAnchor: [25, 16]
+        });
+
+        const marker = L.marker([0, 0], {icon: icon}).addTo(map);
+        const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+        const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        const tiles = L.tileLayer(tileUrl, {attribution});
+        const api_url = "https://api.wheretheiss.at/v1/satellites/25544";
+
+        tiles.addTo(map)        
+
+        async function getISS() {
+            const response = await fetch(api_url);
+            const data = await response.json();
+            const { latitude, longitude } = data;
+            marker.setLatLng([latitude,longitude])
+            document.getElementById('lat').textContent = latitude;
+            document.getElementById('lon').textContent = longitude;
+        };
+
+        getISS();
+        window.refre
+    </script>
+</body>
+
+</html>
