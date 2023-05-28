@@ -13,25 +13,27 @@
 <body>
   <script>
 
+
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(async position => {
-        const lat = position.coords.latitude;
-        const long = position.coords.longitude;
-        document.getElementById("latitude").textContent = lat;
-        document.getElementById("longitude").textContent = long;
+        document.getElementById('sendLoc').addEventListener('click', async event => {
+          const lat = position.coords.latitude;
+          const long = position.coords.longitude;
+          document.getElementById("latitude").textContent = lat;
+          document.getElementById("longitude").textContent = long;
+          const data = { lat, long };
+          const options = {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          };
+          const response = await fetch('/api', options);
+          const jsonRes = await response.json();
 
-        const data = { lat, long };
-        const options = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        };
-        const response = await fetch('/api', options);
-        const jsonRes = await response.json();
-
-        console.log(jsonRes)
+          console.log(jsonRes)
+        });
       });
 
 
@@ -39,10 +41,15 @@
       console.log("geolocation IS NOT available");
     }
 
+    function sendloc() {
+
+    }
+
   </script>
   <h1>Data Selfie App</h1>
   <p>Latitude: <span id="latitude"></span>&deg;<br /></p>
   <p>Longitude: <span id="longitude"></span>&deg;<br /></p>
+  <button type="submit" id="sendLoc">Submit</button>
 </body>
 
 </html>
